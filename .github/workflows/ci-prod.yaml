@@ -7,7 +7,7 @@ on:
 
 env:
   DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-  IMAGE_NAME: spring-k8s-demo
+  IMAGE_NAME: jifelog-auth-api
   KUSTOMIZE_PATH: k8s/overlays/prod
 
 jobs:
