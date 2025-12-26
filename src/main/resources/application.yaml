@@ -1,3 +1,22 @@
 spring:
   application:
     name: auth
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      connection-timeout: 3000
+      idle-timeout: 60000
+      max-lifetime: 1800000
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        highlight_sql: true
+        jdbc:
+          time_zone: UTC

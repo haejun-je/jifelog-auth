@@ -1,0 +1,58 @@
+name: CD Prod
+
+on:
+  push:
+    tags:
+      - 'v*'   # v1.0.0, v1.2.3 이런 tag push 시 동작
+
+env:
+  DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+  IMAGE_NAME: spring-k8s-demo
+  KUSTOMIZE_PATH: k8s/overlays/prod
+
+jobs:
+  build-and-prepare-prod:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for Gradle wrapper
+        run: chmod +x ./gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean build --no-daemon
+
+      - name: Set IMAGE_TAG from Git tag
+        run: echo "IMAGE_TAG=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u "${{ env.DOCKERHUB_USER }}" --password-stdin
+
+      - name: Build image
+        run: |
+          docker build -t ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG} .
+
+      - name: Push image
+        run: |
+          docker push ${DOCKERHUB_USER}/${IMAGE_NAME}:${IMAGE_TAG}
+
+      - name: Update Kustomize image tag for prod
+        run: |
+          sed -i "s/newTag:.*/newTag: ${IMAGE_TAG}/" ${KUSTOMIZE_PATH}/kustomization.yaml
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "actions@github.com"
+          git add ${KUSTOMIZE_PATH}/kustomization.yaml
+          git commit -m "chore: prod deploy ${IMAGE_TAG}" || echo "No changes to commit"
+          git push
