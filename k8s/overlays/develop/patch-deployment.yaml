@@ -10,7 +10,7 @@ spec:
         - name: auth-api
           env:
             - name: SPRING_PROFILES_ACTIVE
-              value: "dev"
+              value: "dev,db"
           resources:
             requests:
               cpu: "100m"
