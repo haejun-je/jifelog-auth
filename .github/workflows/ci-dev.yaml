@@ -49,7 +49,7 @@ jobs:
       # push 이벤트에서만 실행 (PR에서는 skip)
       - name: Set image metadata
         run: |
-          echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=dev-${GITHUB_SHA}" >> $GITHUB_ENV
           echo "IMAGE_REPO=jhjun07/jifelog-auth-api" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
@@ -62,14 +62,14 @@ jobs:
         run: |
           docker build \
             -t ${IMAGE_REPO}:${IMAGE_TAG} \
-            -t ${IMAGE_REPO}:latest \
+            -t ${IMAGE_REPO}:dev-latest \
             .
 
       # 7) Docker Hub로 푸시
       - name: Push Docker image
         run: |
           docker push ${IMAGE_REPO}:${IMAGE_TAG}
-          docker push ${IMAGE_REPO}:latest
+          docker push ${IMAGE_REPO}:dev-latest
 
       - name: Update Kustomize image tag (develop overlay) and push commit
         run: |
