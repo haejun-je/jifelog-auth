@@ -1,24 +1,13 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: auth-api-dev
-  labels:
-    app: auth-api-dev
+  name: auth-api
 spec:
   replicas: 2
-  selector:
-    matchLabels:
-      app: auth-api-dev
   template:
-    metadata:
-      labels:
-        app: auth-api-dev
     spec:
       containers:
-        - name: auth-api-dev
-          image: jifelog-auth-api
-          ports:
-            - containerPort: 8080
+        - name: auth-api
           resources:
             requests:
               cpu: "100m"
