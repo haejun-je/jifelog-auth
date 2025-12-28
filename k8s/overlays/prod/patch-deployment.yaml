@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: auth-api
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: auth-api
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "prod,db"
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

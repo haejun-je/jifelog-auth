@@ -1,0 +1,17 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: services-dev
+nameSuffix: -dev
+
+resources:
+  - ../../base
+
+images:
+  - name: jifelog-auth-api
+    newName: jhjun07/jifelog-auth-api
+    newTag: dev-94d0a30ad5d5f1b3f8ad71593089a47dc62ac9f5
+
+patches:
+  - path: patch-deployment.yaml
+  - path: patch-ingress.yaml
