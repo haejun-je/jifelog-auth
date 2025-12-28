@@ -71,4 +71,4 @@ jobs:
           git config user.email "actions@github.com"
           git add "$FILE"
           git commit -m "chore: prod deploy ${IMAGE_TAG}" || echo "No changes to commit"
-          git push
+          git push -u origin master
