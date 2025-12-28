@@ -2,14 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: auth-api-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-dev"
 spec:
   ingressClassName: public
-  tls:
-    - hosts:
-        - dev-auth-api.jifelog.com
-      secretName: tls-secret-dev
   rules:
     - host: dev-auth-api.jifelog.com
       http:
