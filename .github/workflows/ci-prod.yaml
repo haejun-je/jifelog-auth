@@ -42,7 +42,7 @@ jobs:
 
       - name: Set image metadata
         run: |
-          echo "IMAGE_TAG=${GITHUB_REF_NAME}" >> $GITHUB_ENV
+          echo "IMAGE_TAG=${GITHUB_SHA}" >> $GITHUB_ENV
           echo "IMAGE_REPO=jhjun07/jifelog-auth-api" >> $GITHUB_ENV
 
       - name: Log in to Docker Hub
