@@ -63,6 +63,8 @@ jobs:
       - name: Update Kustomize image tag (prod overlay) and push commit
         run: |
           FILE="k8s/overlays/prod/kustomization.yaml"
+          git fetch origin master:master
+          git checkout master
           sed -i "0,/newTag:/s/newTag:.*/newTag: ${IMAGE_TAG}/" "$FILE"
 
           git config user.name "github-actions[bot]"
