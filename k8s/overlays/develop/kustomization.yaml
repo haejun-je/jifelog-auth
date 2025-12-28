@@ -10,7 +10,7 @@ resources:
 images:
   - name: jifelog-auth-api
     newName: jhjun07/jifelog-auth-api
-    newTag: dev-393ef6f6a1d6e06284fbfc0a3f7491a561cdd623
+    newTag: dev-94d0a30ad5d5f1b3f8ad71593089a47dc62ac9f5
 
 patches:
   - path: patch-deployment.yaml
