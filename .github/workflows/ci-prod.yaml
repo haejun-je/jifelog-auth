@@ -2,8 +2,10 @@ name: CI (prod) - Build, Push Image, Update Kustomize
 
 on:
   push:
-    tags:
-      - "v[0-9]*.[0-9]*.[0-9]*"
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+    types: [opened, synchronize, reopened, closed]
 
 permissions:
   contents: write
@@ -14,6 +16,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.event_name == 'push' || (github.event_name == 'pull_request' && (github.event.action != 'closed' || github.event.pull_request.merged == true))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -52,23 +55,21 @@ jobs:
         run: |
           docker build \
             -t ${IMAGE_REPO}:${IMAGE_TAG} \
-            -t ${IMAGE_REPO}:prod-latest \
+            -t ${IMAGE_REPO}:latest \
             .
 
       - name: Push Docker image
         run: |
           docker push ${IMAGE_REPO}:${IMAGE_TAG}
-          docker push ${IMAGE_REPO}:prod-latest
+          docker push ${IMAGE_REPO}:latest
 
       - name: Update Kustomize image tag (prod overlay) and push commit
         run: |
           FILE="k8s/overlays/prod/kustomization.yaml"
-          git fetch origin master:master
-          git checkout master
           sed -i "0,/newTag:/s/newTag:.*/newTag: ${IMAGE_TAG}/" "$FILE"
 
           git config user.name "github-actions[bot]"
           git config user.email "actions@github.com"
           git add "$FILE"
           git commit -m "chore: prod deploy ${IMAGE_TAG}" || echo "No changes to commit"
-          git push -u origin master
+          git push
