@@ -7,33 +7,36 @@ import jakarta.persistence.EnumType
 import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import java.time.OffsetDateTime
+import org.hibernate.annotations.DynamicInsert
+import org.hibernate.annotations.UuidGenerator
+import java.time.Instant
 import java.util.UUID
 
 @Entity
+@DynamicInsert
 @Table(schema = "auth", name = "user")
 class UserEntity(
-
     @Id
+    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
     @Column(name = "id", columnDefinition = "uuid", updatable = false)
-    val id: UUID,
+    val id: UUID? = null,
 
-    @Column(name = "username", length = 50, nullable = false)
+    @Column(name = "username", nullable = false)
     val username: String,
 
-    @Column(name = "email", length = 254)
-    val email: String? = null,
+    @Column(name = "email")
+    val email: String,
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     val status: UserStatus = UserStatus.ACTIVE,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: OffsetDateTime,
+    val createdAt: Instant,
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: OffsetDateTime,
+    val updatedAt: Instant,
 
     @Column(name = "deleted_at")
-    val deletedAt: OffsetDateTime? = null
+    val deletedAt: Instant? = null
 )

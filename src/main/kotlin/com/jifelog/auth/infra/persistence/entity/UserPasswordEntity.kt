@@ -1,14 +1,9 @@
 package com.jifelog.auth.infra.persistence.entity
 
 import com.jifelog.auth.infra.persistence.entity.enums.PasswordAlgo
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
-import jakarta.persistence.Id
-import jakarta.persistence.Table
-import java.time.OffsetDateTime
-import java.util.UUID
+import jakarta.persistence.*
+import java.time.Instant
+import java.util.*
 
 @Entity
 @Table(schema = "auth", name = "user_password")
@@ -25,14 +20,14 @@ class UserPasswordEntity (
     val passwordAlgo: PasswordAlgo = PasswordAlgo.ARGON2ID,
 
     @Column(name = "password_updated_at", nullable = false)
-    val passwordUpdatedAt: OffsetDateTime,
+    val passwordUpdatedAt: Instant,
 
     @Column(name = "failed_count", nullable = false)
     val failedCount: Int = 0,
 
     @Column(name = "locked_until")
-    val lockedUntil: OffsetDateTime? = null,
+    val lockedUntil: Instant? = null,
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: OffsetDateTime
+    val updatedAt: Instant
 )

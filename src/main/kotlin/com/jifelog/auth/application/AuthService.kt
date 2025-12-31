@@ -1,15 +1,40 @@
 package com.jifelog.auth.application
 
+import com.jifelog.auth.application.command.RegisterUserCommand
+import com.jifelog.auth.application.port.AuthCommandPort
 import com.jifelog.auth.application.port.AuthQueryPort
+import com.jifelog.auth.domain.PasswordAlgoType
 import com.jifelog.auth.domain.User
+import com.jifelog.auth.domain.UserPassword
 import org.springframework.stereotype.Service
-import java.util.UUID
+import org.springframework.transaction.annotation.Transactional
+import java.util.*
 
 @Service
+@Transactional
 class AuthService(
-    private val authQueryPort : AuthQueryPort
+    private val authQueryPort : AuthQueryPort,
+    private val authCommandPort: AuthCommandPort,
+    private val passwordHasher: PasswordHasher
 ) {
-    fun test(): User{
-        return authQueryPort.loadUser(UUID.fromString("019b5b63-481f-797d-b659-b708e9d48e37"))
+    fun registerUser(
+        registerUserCommand: RegisterUserCommand
+    ): User {
+        val userPassword = UserPassword.withoutId(
+            passwordHasher.encode(registerUserCommand.password),
+            PasswordAlgoType.ARGON2ID
+        )
+
+        val user = User.withoutId(
+            registerUserCommand.username,
+            registerUserCommand.email,
+            userPassword
+        )
+
+        return authCommandPort.saveUser(user)
+    }
+
+    fun test(id: String): User{
+        return authQueryPort.loadUser(UUID.fromString(id))
     }
 }

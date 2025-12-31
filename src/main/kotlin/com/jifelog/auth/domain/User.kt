@@ -1,34 +1,75 @@
 package com.jifelog.auth.domain
 
-import java.time.OffsetDateTime
+import java.time.Instant
 import java.util.UUID
 
 class User(
-    val id: UUID,
+    val id: UUID? = null,
     val username: String,
-    val email: String?,
+    val email: String,
     val status: UserStatusType,
-    val createdAt: OffsetDateTime,
-    val updatedAt: OffsetDateTime,
-    val deletedAt: OffsetDateTime?
+    val createdAt: Instant,
+    val updatedAt: Instant,
+    val deletedAt: Instant? = null,
+    val userPassword: UserPassword
 ) {
+    companion object {
+        fun withoutId(
+            username: String,
+            email: String,
+            userPassword: UserPassword
+        ): User {
+            return User(
+                username = username,
+                email = email,
+                status = UserStatusType.ACTIVE,
+                createdAt = Instant.now(),
+                updatedAt = Instant.now(),
+                userPassword = userPassword,
+            )
+        }
+
+        fun withId(
+            id: UUID,
+            username: String,
+            email: String,
+            status: UserStatusType,
+            createdAt: Instant,
+            updatedAt: Instant,
+            deletedAt: Instant?,
+            userPassword: UserPassword
+        ): User {
+            return User(
+                id,
+                username,
+                email,
+                status,
+                createdAt,
+                updatedAt,
+                deletedAt,
+                userPassword
+            )
+        }
+    }
+
     fun isActive(): Boolean =
         status == UserStatusType.ACTIVE && deletedAt == null
 
-    fun deactivate(now: OffsetDateTime): User =
+    fun deactivate(): User =
         copy(
             status = UserStatusType.DISABLED,
-            updatedAt = now
+            updatedAt = Instant.now()
         )
 
     private fun copy(
-        id: UUID = this.id,
+        id: UUID = this.id!!,
         username: String = this.username,
-        email: String? = this.email,
+        email: String = this.email,
         status: UserStatusType = this.status,
-        createdAt: OffsetDateTime = this.createdAt,
-        updatedAt: OffsetDateTime = this.updatedAt,
-        deletedAt: OffsetDateTime? = this.deletedAt
+        createdAt: Instant = this.createdAt,
+        updatedAt: Instant = this.updatedAt,
+        deletedAt: Instant? = this.deletedAt,
+        userPassword: UserPassword = this.userPassword
     ): User =
-        User(id, username, email, status, createdAt, updatedAt, deletedAt)
+        User(id, username, email, status, createdAt, updatedAt, deletedAt, userPassword)
 }
