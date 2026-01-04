@@ -3,12 +3,7 @@ package com.jifelog.auth.common
 import java.security.SecureRandom
 
 object TokenUtils {
-    private const val CHAR_POOL =
-        """
-            ABCDEFGHIJKLMNOPQRSTUVWXYZ
-            abcdefghijklmnopqrstuvwxyz
-            0123456789
-        """
+    private const val CHAR_POOL = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
 
     private val random = SecureRandom()
 

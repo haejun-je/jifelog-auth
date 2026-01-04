@@ -6,3 +6,5 @@ jifelog:
   redis:
     host: host
     password: password
+  mail:
+    api-key: api-key
