@@ -19,8 +19,8 @@ class TokenAdapter(
 
         stringRedisTemplate.opsForValue()
             .set(
-                "auth:signup:email-verify:$hashedEmail"
-                , hashedToken,
+                "auth:signup:email-verify:$hashedEmail",
+                hashedToken,
                 Duration.ofSeconds(ttlSeconds)
             )
     }
