@@ -6,4 +6,9 @@ interface TokenCommandPort {
         hashedToken: String,
         ttlSeconds: Long
     )
+
+    fun saveEmailVerified(
+        email: String,
+        ttlSeconds: Long
+    )
 }

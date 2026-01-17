@@ -15,4 +15,12 @@ object HashUtils {
             .let {
                 Base64.getUrlEncoder().withoutPadding().encodeToString(it)
             }
+
+
+    fun equalsHashed(aHashed: String, bHashed: String): Boolean {
+        return MessageDigest.isEqual(
+            aHashed.toByteArray(Charsets.UTF_8),
+            bHashed.toByteArray(Charsets.UTF_8)
+        )
+    }
 }

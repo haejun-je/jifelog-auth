@@ -6,7 +6,6 @@ import com.jifelog.auth.application.command.RegisterUserCommand
 import com.jifelog.auth.application.command.RequestEmailVerificationCommand
 import com.jifelog.auth.presentation.request.SendEmailVerificationRequest
 import com.jifelog.auth.presentation.request.SignupRequest
-import com.jifelog.auth.presentation.request.VerifyEmailRequest
 import com.jifelog.auth.presentation.response.SignupResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -14,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
@@ -41,7 +41,7 @@ class SignupController(
         )
     }
 
-    @PostMapping("/signup/email/send")
+    @PostMapping("/signup/email/verify")
     fun sendVerificationEmail(
         @RequestBody @Valid request: SendEmailVerificationRequest
     ) {
@@ -52,14 +52,15 @@ class SignupController(
         )
     }
 
-    @PostMapping("/signup/email/verify")
+    @GetMapping("/signup/email/verify")
     fun verifyEmail(
-        @RequestBody @Valid request: VerifyEmailRequest
+        @RequestParam email: String,
+        @RequestParam token: String
     ) {
         signupService.confirmEmailVerification(
             ConfirmEmailVerificationCommand(
-                request.email,
-                request.token
+                email,
+                token
             )
         )
     }
