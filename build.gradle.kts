@@ -30,6 +30,8 @@ dependencies {
     implementation("tools.jackson.module:jackson-module-kotlin")
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
 
+    implementation("com.resend:resend-java:+")
+
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
     testImplementation("org.springframework.boot:spring-boot-starter-security-test")
