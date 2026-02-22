@@ -12,7 +12,6 @@ spring:
       connection-timeout: 3000
       idle-timeout: 60000
       max-lifetime: 1800000
-
   jpa:
     open-in-view: false
     hibernate:
@@ -37,6 +36,15 @@ spring:
           max-idle: 16
           min-idle: 0
           max-wait: 1s
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: true
+        http-only: true
+        name: SESSION
+
 jifelog:
   mail:
     template-id:
