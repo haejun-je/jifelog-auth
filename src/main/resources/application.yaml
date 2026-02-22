@@ -46,6 +46,10 @@ server:
         name: SESSION
 
 jifelog:
+  security:
+    jwt:
+      secret: ${secret.security.jwt.secret}
+      issuer: ${secret.security.jwt.issuer}
   mail:
     template-id:
       verification: bd10693a-62ef-4456-a172-a632f2cbdad5

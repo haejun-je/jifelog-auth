@@ -18,6 +18,18 @@ java {
 
 repositories {
     mavenCentral()
+    mavenLocal()
+
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/haejun-je/jifelog-security-jwt-starter")
+        credentials {
+            username = providers.environmentVariable("GITHUB_ACTOR").orNull
+                ?: providers.gradleProperty("gpr.user").orNull
+            password = providers.environmentVariable("GITHUB_TOKEN").orNull
+                ?: providers.gradleProperty("gpr.key").orNull
+        }
+    }
 }
 
 dependencies {
@@ -32,6 +44,8 @@ dependencies {
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
 
     implementation("com.resend:resend-java:+")
+
+    implementation("com.jifelog.platform:jifelog-security-jwt-starter:0.1.0")
 
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
