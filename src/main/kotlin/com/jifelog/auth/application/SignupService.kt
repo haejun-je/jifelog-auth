@@ -12,11 +12,9 @@ import com.jifelog.auth.domain.UserPassword
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.*
 
 @Service
 class SignupService(
-    private val signupQueryPort : SignupQueryPort,
     private val signupCommandPort: SignupCommandPort,
     private val tokenCommandPort: TokenCommandPort,
     private val tokenQueryPort: TokenQueryPort,
@@ -90,9 +88,5 @@ class SignupService(
             throw RuntimeException("Invalid token: $storedToken")
         }
 
-    }
-
-    fun test(id: String): User{
-        return signupQueryPort.loadUser(UUID.fromString(id))
     }
 }

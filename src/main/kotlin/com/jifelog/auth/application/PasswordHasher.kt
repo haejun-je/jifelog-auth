@@ -10,4 +10,11 @@ class PasswordHasher(
     fun encode(password: String): String {
         return passwordEncoder.encode(password)!!
     }
+
+    fun matches(
+        rawPassword: String,
+        storedHash: String
+    ): Boolean {
+        return passwordEncoder.matches(rawPassword, storedHash)
+    }
 }
