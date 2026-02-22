@@ -8,3 +8,9 @@ jifelog:
     password: password
   mail:
     api-key: api-key
+
+secret:
+  security:
+    jwt:
+      secret: secret
+      issuer: issuer
