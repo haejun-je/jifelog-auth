@@ -29,6 +29,9 @@ jobs:
           cache: gradle
 
       - name: Build jar
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PACKAGES_TOKEN }}
+          GITHUB_ACTOR: ${{ secrets.GH_ID }}
         run: |
           echo ${{secrets.SECRET_DATASOURCE}} | base64 --decode > ./src/main/resources/application-db.yaml
           
