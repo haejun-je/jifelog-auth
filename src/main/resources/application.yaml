@@ -1,6 +1,9 @@
 spring:
   application:
     name: auth
+  config:
+    import:
+      - "classpath:application-db.yaml"
   datasource:
     url: ${jifelog.database.url}
     username: ${jifelog.database.username}
