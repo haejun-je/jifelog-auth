@@ -18,6 +18,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: auth-api-service
+                name: auth-api
                 port:
                   number: 80
