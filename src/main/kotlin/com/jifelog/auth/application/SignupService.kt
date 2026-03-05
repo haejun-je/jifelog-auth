@@ -65,10 +65,10 @@ class SignupService(
         log.info("token: $token")
 
         // 인증 메일 발송
-        /*mailCommandPort.sendVerificationMail(
+        mailCommandPort.sendVerificationMail(
             command.email,
             token
-        )*/
+        )
     }
 
     fun confirmEmailVerification(
