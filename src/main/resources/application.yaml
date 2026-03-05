@@ -1,13 +1,13 @@
 spring:
   application:
     name: auth
-  config:
-    import:
-      - "classpath:secret-properties.yaml"
+#  config:
+#    import:
+#      - "classpath:secret-properties.yaml"
   datasource:
-    url: ${jifelog.database.url}
-    username: ${jifelog.database.username}
-    password: ${jifelog.database.password}
+    url: jdbc:postgresql://${DB_HOST}:5432/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
       maximum-pool-size: 10
@@ -28,9 +28,9 @@ spring:
 
   data:
     redis:
-      host: ${jifelog.redis.host}
+      host: ${REDIS_HOST}
       port: 6379
-      password: ${jifelog.redis.password}
+      password: ${REDIS_PASSWORD}
       database: 0
       timeout: 2s
       lettuce:
@@ -51,8 +51,8 @@ server:
 jifelog:
   security:
     jwt:
-      secret: ${secret.security.jwt.secret}
-      issuer: ${secret.security.jwt.issuer}
+      secret: ${JWT_SECRET}
+      issuer: jifelog-gateway
   mail:
     template-id:
       verification: bd10693a-62ef-4456-a172-a632f2cbdad5
