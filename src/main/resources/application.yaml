@@ -51,7 +51,7 @@ jifelog:
   security:
     jwt:
       secret: ${JIFELOG_JWT_SECRET}
-      issuer: jifelog-gateway
+      issuer: gateway.jifelog.com
   mail:
     api-key: ${JIFELOG_MAIL_API_KEY}
     template-id:
