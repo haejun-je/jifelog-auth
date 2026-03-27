@@ -6,6 +6,8 @@ import com.jifelog.auth.application.command.RequestEmailVerificationCommand
 import com.jifelog.auth.application.port.*
 import com.jifelog.auth.common.HashUtils
 import com.jifelog.auth.common.TokenUtils
+import com.jifelog.auth.common.exception.AuthException
+import com.jifelog.auth.common.exception.ErrorCode
 import com.jifelog.auth.domain.PasswordAlgoType
 import com.jifelog.auth.domain.User
 import com.jifelog.auth.domain.UserPassword
@@ -30,8 +32,7 @@ class SignupService(
         // 이메일 인증 확인
         if (!tokenQueryPort.checkEmailVerified(command.email)) {
 
-            // TODO: 예외처리 고도화 필요
-            throw IllegalStateException("Email is not verified")
+            throw AuthException(ErrorCode.U_01_003)
         }
 
         val userPassword = UserPassword.withoutId(
@@ -83,10 +84,7 @@ class SignupService(
                 60 * 10
             )
         } else {
-            // 유효하지 않은 토큰
-            // TODO: 예외처리 고도화 필요
-            throw RuntimeException("Invalid token: $storedToken")
+            throw AuthException(ErrorCode.C_01_001)
         }
-
     }
 }

@@ -3,6 +3,8 @@ package com.jifelog.auth.presentation
 import com.jifelog.auth.application.LoginService
 import com.jifelog.auth.application.command.LoginCommand
 import com.jifelog.auth.presentation.request.LoginRequest
+import com.jifelog.auth.presentation.response.ApiResponse
+import com.jifelog.auth.presentation.response.Empty
 import com.jifelog.security.jwt.api.JifelogUser
 import com.jifelog.security.jwt.api.JifelogUserData
 import jakarta.validation.Valid
@@ -19,20 +21,19 @@ class AuthController(
     @PostMapping("/login")
     fun login(
         @RequestBody @Valid request: LoginRequest
-    ) {
+    ): ResponseEntity<ApiResponse<Empty>> {
         loginService.login(
             LoginCommand(
                 request.email,
                 request.password
             )
         )
+        return ResponseEntity.ok(ApiResponse.empty())
     }
-
 
     @GetMapping("/user")
-    fun test(
+    fun getUser(
         @JifelogUser user: JifelogUserData
-    ): ResponseEntity<JifelogUserData> {
-        return ResponseEntity.ok(user)
-    }
+    ): ResponseEntity<ApiResponse<JifelogUserData>> =
+        ResponseEntity.ok(ApiResponse.of(user))
 }
