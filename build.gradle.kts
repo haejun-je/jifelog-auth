@@ -25,9 +25,7 @@ repositories {
         url = uri("https://maven.pkg.github.com/haejun-je/jifelog-security-jwt-starter")
         credentials {
             username = providers.environmentVariable("GITHUB_ACTOR").orNull
-                ?: providers.gradleProperty("gpr.user").orNull
             password = providers.environmentVariable("GITHUB_TOKEN").orNull
-                ?: providers.gradleProperty("gpr.key").orNull
         }
     }
 }
