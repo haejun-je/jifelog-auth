@@ -49,7 +49,7 @@ class AuthControllerTest : AbstractControllerTest() {
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isUnauthorized)
-                .andExpect(jsonPath("$.data.error_code").value("U_01_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EU_01_001.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EU_01_001.defaultMessage))
         }
 
@@ -66,7 +66,7 @@ class AuthControllerTest : AbstractControllerTest() {
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isUnauthorized)
-                .andExpect(jsonPath("$.data.error_code").value("U_01_003"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EU_01_003.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EU_01_003.defaultMessage))
         }
 
@@ -83,7 +83,7 @@ class AuthControllerTest : AbstractControllerTest() {
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isNotFound)
-                .andExpect(jsonPath("$.data.error_code").value("N_01_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EN_01_001.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EN_01_001.defaultMessage))
         }
 
@@ -95,7 +95,7 @@ class AuthControllerTest : AbstractControllerTest() {
                     .content("""{"email": "", "password": ""}""")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_001.name))
                 .andExpect(jsonPath("$.data.details").isArray)
         }
 
@@ -107,7 +107,7 @@ class AuthControllerTest : AbstractControllerTest() {
                     .content("not-valid-json{{{")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.data.error_code").value("B_00_002"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_002.name))
         }
     }
 

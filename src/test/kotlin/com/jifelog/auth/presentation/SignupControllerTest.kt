@@ -87,7 +87,7 @@ class SignupControllerTest : AbstractControllerTest() {
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath("$.data.error_code").value("C_01_002"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EC_01_002.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EC_01_002.defaultMessage))
         }
 
@@ -104,7 +104,7 @@ class SignupControllerTest : AbstractControllerTest() {
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isUnauthorized)
-                .andExpect(jsonPath("$.data.error_code").value("U_01_003"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EU_01_003.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EU_01_003.defaultMessage))
         }
 
@@ -116,7 +116,7 @@ class SignupControllerTest : AbstractControllerTest() {
                     .content("""{"email": "not-a-valid-email", "username": "", "password": ""}""")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_001.name))
                 .andExpect(jsonPath("$.data.details").isArray)
         }
     }
@@ -145,7 +145,7 @@ class SignupControllerTest : AbstractControllerTest() {
                     .content("""{"email": "invalid-email"}""")
             )
                 .andExpect(status().isBadRequest)
-                .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_001.name))
         }
     }
 
@@ -174,7 +174,7 @@ class SignupControllerTest : AbstractControllerTest() {
                     .param("token", "invalid-token")
             )
                 .andExpect(status().isConflict)
-                .andExpect(jsonPath("$.data.error_code").value("C_01_001"))
+                .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EC_01_001.name))
                 .andExpect(jsonPath("$.data.message").value(ErrorCode.EC_01_001.defaultMessage))
         }
     }
