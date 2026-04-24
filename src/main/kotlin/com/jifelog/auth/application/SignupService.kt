@@ -32,7 +32,7 @@ class SignupService(
         // 이메일 인증 확인
         if (!tokenQueryPort.checkEmailVerified(command.email)) {
 
-            throw AuthException(ErrorCode.U_01_003)
+            throw AuthException(ErrorCode.EU_01_003)
         }
 
         val userPassword = UserPassword.withoutId(
@@ -84,7 +84,7 @@ class SignupService(
                 60 * 10
             )
         } else {
-            throw AuthException(ErrorCode.C_01_001)
+            throw AuthException(ErrorCode.EC_01_001)
         }
     }
 }

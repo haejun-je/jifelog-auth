@@ -16,10 +16,10 @@ class SignInAdapter(
 ) : SignInQueryPort {
     override fun loadUser(email: String): User {
         val userEntity = userJpaRepository.findByEmail(email)
-            ?: throw AuthException(ErrorCode.N_01_001)
+            ?: throw AuthException(ErrorCode.EN_01_001)
 
         val passwordEntity = userPasswordJpaRepository.findByUserId(userEntity.id!!)
-            ?: throw AuthException(ErrorCode.N_01_001)
+            ?: throw AuthException(ErrorCode.EN_01_001)
 
         return UserMapper.toDomain(userEntity, passwordEntity)
     }

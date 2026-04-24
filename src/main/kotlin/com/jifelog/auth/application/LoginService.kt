@@ -6,7 +6,6 @@ import com.jifelog.auth.application.port.SessionQueryPort
 import com.jifelog.auth.application.port.SignInQueryPort
 import com.jifelog.auth.common.exception.AuthException
 import com.jifelog.auth.common.exception.ErrorCode
-import com.jifelog.auth.infra.session.UserSession
 import org.springframework.stereotype.Service
 
 @Service
@@ -29,7 +28,7 @@ class LoginService(
         if (isValidPassword) {
             sessionCommandPort.registerUserSession(user)
         } else {
-            throw AuthException(ErrorCode.U_01_001)
+            throw AuthException(ErrorCode.EU_01_001)
         }
     }
 }
