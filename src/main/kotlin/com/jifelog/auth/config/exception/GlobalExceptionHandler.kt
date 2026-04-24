@@ -32,7 +32,7 @@ class GlobalExceptionHandler {
         }
         return ResponseEntity
             .badRequest()
-            .body(ApiErrorResponse.of(ErrorCode.B_00_001, details))
+            .body(ApiErrorResponse.of(ErrorCode.EB_00_001, details))
     }
 
     @ExceptionHandler(HttpMessageNotReadableException::class)
@@ -41,7 +41,7 @@ class GlobalExceptionHandler {
 
         return ResponseEntity
             .badRequest()
-            .body(ApiErrorResponse.of(ErrorCode.B_00_002))
+            .body(ApiErrorResponse.of(ErrorCode.EB_00_002))
     }
 
 
@@ -50,6 +50,6 @@ class GlobalExceptionHandler {
         log.error("Unhandled exception", ex)
         return ResponseEntity
             .internalServerError()
-            .body(ApiErrorResponse.of(ErrorCode.S_00_001))
+            .body(ApiErrorResponse.of(ErrorCode.ES_00_001))
     }
 }

@@ -34,7 +34,7 @@ class TokenAdapter(
 
         return stringRedisTemplate.opsForValue()
             .get(key)
-            ?: throw AuthException(ErrorCode.U_01_002)
+            ?: throw AuthException(ErrorCode.EU_01_002)
     }
 
     override fun checkEmailVerified(email: String): Boolean {

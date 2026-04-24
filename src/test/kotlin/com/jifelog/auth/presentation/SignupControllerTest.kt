@@ -1,24 +1,19 @@
 package com.jifelog.auth.presentation
 
-import com.jifelog.auth.application.SignupService
 import com.jifelog.auth.common.exception.AuthException
 import com.jifelog.auth.common.exception.ErrorCode
-import com.jifelog.auth.config.JacksonConfig
 import com.jifelog.auth.domain.PasswordAlgoType
 import com.jifelog.auth.domain.User
 import com.jifelog.auth.domain.UserPassword
 import com.jifelog.auth.domain.UserStatusType
-import com.jifelog.auth.support.TestSecurityConfig
+import com.jifelog.auth.presentation.request.SendEmailVerificationRequest
+import com.jifelog.auth.presentation.request.SignupRequest
+import com.jifelog.auth.support.AbstractControllerTest
+import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.BDDMockito
 import org.mockito.kotlin.any
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
-import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
-import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
@@ -26,16 +21,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 import java.time.Instant
 import java.util.*
 
-@WebMvcTest(SignupController::class)
-@Import(TestSecurityConfig::class, JacksonConfig::class)
-@TestPropertySource(properties = ["jifelog.security.jwt.secret=test-secret-key-for-testing-only-not-prod"])
-class SignupControllerTest {
-
-    @Autowired
-    private lateinit var mockMvc: MockMvc
-
-    @MockitoBean
-    private lateinit var signupService: SignupService
+class SignupControllerTest : AbstractControllerTest() {
 
     private fun createMockUser(
         id: UUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
@@ -55,115 +41,141 @@ class SignupControllerTest {
         )
     }
 
-    // ==================== POST /signup ====================
+    @Nested
+    inner class `POST signup` {
 
-    @Test
-    fun `POST signup - 정상 응답 200`() {
-        BDDMockito.given(signupService.registerUser(any()))
-            .willReturn(createMockUser())
+        @Test
+        fun `정상 응답 200`() {
+            val payload = SignupRequest(
+                "test@example.com",
+                "username",
+                "password123"
+            )
 
-        mockMvc.perform(
-            post("/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "test@example.com", "username": "testuser", "password": "password123"}""")
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.data.id").value("550e8400-e29b-41d4-a716-446655440000"))
-            .andExpect(jsonPath("$.data.username").value("testuser"))
-            .andExpect(jsonPath("$.data.created_at").exists())
+            val uuid = UUID.randomUUID()
+
+            val user = createMockUser(
+                id = uuid,
+                username = payload.username,
+                email = payload.email,
+            )
+
+            BDDMockito.given(signupService.registerUser(any()))
+                .willReturn(user)
+
+            mockMvc.perform(
+                post("/signup")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(payload))
+            )
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.data.id").value(user.id.toString()))
+                .andExpect(jsonPath("$.data.username").value(user.username))
+                .andExpect(jsonPath("$.data.created_at").exists())
+        }
+
+        @Test
+        fun `이미 가입된 이메일 409 C_01_002`() {
+            BDDMockito.given(signupService.registerUser(any()))
+                .willThrow(AuthException(ErrorCode.EC_01_002))
+
+            val payload = SignupRequest("existing@example.com", "testuser", "password123")
+
+            mockMvc.perform(
+                post("/signup")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(payload))
+            )
+                .andExpect(status().isConflict)
+                .andExpect(jsonPath("$.data.error_code").value("C_01_002"))
+                .andExpect(jsonPath("$.data.message").value(ErrorCode.EC_01_002.defaultMessage))
+        }
+
+        @Test
+        fun `이메일 인증 미완료 401 U_01_003`() {
+            BDDMockito.given(signupService.registerUser(any()))
+                .willThrow(AuthException(ErrorCode.EU_01_003))
+
+            val payload = SignupRequest("test@example.com", "testuser", "password123")
+
+            mockMvc.perform(
+                post("/signup")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(payload))
+            )
+                .andExpect(status().isUnauthorized)
+                .andExpect(jsonPath("$.data.error_code").value("U_01_003"))
+                .andExpect(jsonPath("$.data.message").value(ErrorCode.EU_01_003.defaultMessage))
+        }
+
+        @Test
+        fun `요청 필드 유효성 실패 400 B_00_001`() {
+            mockMvc.perform(
+                post("/signup")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""{"email": "not-a-valid-email", "username": "", "password": ""}""")
+            )
+                .andExpect(status().isBadRequest)
+                .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
+                .andExpect(jsonPath("$.data.details").isArray)
+        }
     }
 
-    @Test
-    fun `POST signup - 이미 가입된 이메일 409 C_01_002`() {
-        BDDMockito.given(signupService.registerUser(any()))
-            .willThrow(AuthException(ErrorCode.C_01_002))
+    @Nested
+    inner class `POST signup email verify` {
 
-        mockMvc.perform(
-            post("/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "existing@example.com", "username": "testuser", "password": "password123"}""")
-        )
-            .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.data.error_code").value("C_01_002"))
-            .andExpect(jsonPath("$.data.message").value(ErrorCode.C_01_002.defaultMessage))
+        @Test
+        fun `정상 응답 200`() {
+            val payload = SendEmailVerificationRequest("test@example.com")
+
+            mockMvc.perform(
+                post("/signup/email/verify")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(jsonMapper.writeValueAsString(payload))
+            )
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.data").exists())
+        }
+
+        @Test
+        fun `잘못된 이메일 형식 400 B_00_001`() {
+            mockMvc.perform(
+                post("/signup/email/verify")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""{"email": "invalid-email"}""")
+            )
+                .andExpect(status().isBadRequest)
+                .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
+        }
     }
 
-    @Test
-    fun `POST signup - 이메일 인증 미완료 401 U_01_003`() {
-        BDDMockito.given(signupService.registerUser(any()))
-            .willThrow(AuthException(ErrorCode.U_01_003))
+    @Nested
+    inner class `GET signup email verify` {
 
-        mockMvc.perform(
-            post("/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "test@example.com", "username": "testuser", "password": "password123"}""")
-        )
-            .andExpect(status().isUnauthorized)
-            .andExpect(jsonPath("$.data.error_code").value("U_01_003"))
-            .andExpect(jsonPath("$.data.message").value(ErrorCode.U_01_003.defaultMessage))
-    }
+        @Test
+        fun `정상 응답 200`() {
+            mockMvc.perform(
+                get("/signup/email/verify")
+                    .param("email", "test@example.com")
+                    .param("token", "validtoken123456")
+            )
+                .andExpect(status().isOk)
+                .andExpect(jsonPath("$.data").exists())
+        }
 
-    @Test
-    fun `POST signup - 요청 필드 유효성 실패 400 B_00_001`() {
-        mockMvc.perform(
-            post("/signup")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "not-a-valid-email", "username": "", "password": ""}""")
-        )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
-            .andExpect(jsonPath("$.data.details").isArray)
-    }
+        @Test
+        fun `유효하지 않은 토큰 409 C_01_001`() {
+            BDDMockito.willThrow(AuthException(ErrorCode.EC_01_001))
+                .given(signupService).confirmEmailVerification(any())
 
-    // ==================== POST /signup/email/verify ====================
-
-    @Test
-    fun `POST signup email verify - 정상 응답 200`() {
-        mockMvc.perform(
-            post("/signup/email/verify")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "test@example.com"}""")
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.data").exists())
-    }
-
-    @Test
-    fun `POST signup email verify - 잘못된 이메일 형식 400 B_00_001`() {
-        mockMvc.perform(
-            post("/signup/email/verify")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""{"email": "invalid-email"}""")
-        )
-            .andExpect(status().isBadRequest)
-            .andExpect(jsonPath("$.data.error_code").value("B_00_001"))
-    }
-
-    // ==================== GET /signup/email/verify ====================
-
-    @Test
-    fun `GET signup email verify - 정상 응답 200`() {
-        mockMvc.perform(
-            get("/signup/email/verify")
-                .param("email", "test@example.com")
-                .param("token", "validtoken123456")
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$.data").exists())
-    }
-
-    @Test
-    fun `GET signup email verify - 유효하지 않은 토큰 409 C_01_001`() {
-        BDDMockito.willThrow(AuthException(ErrorCode.C_01_001))
-            .given(signupService).confirmEmailVerification(any())
-
-        mockMvc.perform(
-            get("/signup/email/verify")
-                .param("email", "test@example.com")
-                .param("token", "invalid-token")
-        )
-            .andExpect(status().isConflict)
-            .andExpect(jsonPath("$.data.error_code").value("C_01_001"))
-            .andExpect(jsonPath("$.data.message").value(ErrorCode.C_01_001.defaultMessage))
+            mockMvc.perform(
+                get("/signup/email/verify")
+                    .param("email", "test@example.com")
+                    .param("token", "invalid-token")
+            )
+                .andExpect(status().isConflict)
+                .andExpect(jsonPath("$.data.error_code").value("C_01_001"))
+                .andExpect(jsonPath("$.data.message").value(ErrorCode.EC_01_001.defaultMessage))
+        }
     }
 }
