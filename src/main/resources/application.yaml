@@ -46,7 +46,7 @@ server:
         secure: true
         http-only: true
         name: SESSION
-        domain: .jifelog.com
+        domain: jifelog.com
 
 jifelog:
   security:
