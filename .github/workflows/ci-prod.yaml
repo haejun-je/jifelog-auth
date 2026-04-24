@@ -6,6 +6,7 @@ on:
 
 permissions:
   contents: write
+  packages: read
 
 concurrency:
   group: prod-cicd
@@ -30,8 +31,6 @@ jobs:
 
       - name: Build jar
         run: |
-          echo ${{secrets.SECRET_DATASOURCE}} | base64 --decode > ./src/main/resources/application-db.yaml
-          
           chmod +x ./gradlew
           ./gradlew clean build --no-daemon
           ls -al build/libs

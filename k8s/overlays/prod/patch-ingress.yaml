@@ -2,14 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: auth-api-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
   ingressClassName: public
-  tls:
-    - hosts:
-        - auth-api.jifelog.com
-      secretName: tls-secret-prod
   rules:
     - host: auth-api.jifelog.com
       http:
@@ -18,6 +12,6 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: auth-api-service
+                name: auth-api
                 port:
-                  number: 8080
+                  number: 80

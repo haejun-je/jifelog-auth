@@ -1,7 +1,5 @@
-jifelog:
-  security:
-    jwt:
-      issuer: dev-gateway.jifelog.com
+server:
+  port: 8081
 
 logging:
   level:

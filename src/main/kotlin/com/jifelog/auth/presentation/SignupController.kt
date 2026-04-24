@@ -6,15 +6,12 @@ import com.jifelog.auth.application.command.RegisterUserCommand
 import com.jifelog.auth.application.command.RequestEmailVerificationCommand
 import com.jifelog.auth.presentation.request.SendEmailVerificationRequest
 import com.jifelog.auth.presentation.request.SignupRequest
+import com.jifelog.auth.presentation.response.ApiResponse
+import com.jifelog.auth.presentation.response.Empty
 import com.jifelog.auth.presentation.response.SignupResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 class SignupController(
@@ -23,7 +20,7 @@ class SignupController(
     @PostMapping("/signup")
     fun signup(
         @RequestBody @Valid request: SignupRequest
-    ): ResponseEntity<SignupResponse> {
+    ): ResponseEntity<ApiResponse<SignupResponse>> {
         val command = RegisterUserCommand(
             request.email,
             request.username,
@@ -33,10 +30,12 @@ class SignupController(
         val result = signupService.registerUser(command)
 
         return ResponseEntity.ok(
-            SignupResponse(
-                result.id!!,
-                result.username,
-                result.createdAt
+            ApiResponse.of(
+                SignupResponse(
+                    result.id!!,
+                    result.username,
+                    result.createdAt
+                )
             )
         )
     }
@@ -44,33 +43,27 @@ class SignupController(
     @PostMapping("/signup/email/verify")
     fun sendVerificationEmail(
         @RequestBody @Valid request: SendEmailVerificationRequest
-    ) {
+    ): ResponseEntity<ApiResponse<Empty>> {
         signupService.requestEmailVerification(
             RequestEmailVerificationCommand(
                 request.email
             )
         )
+
+        return ResponseEntity.ok(ApiResponse.empty())
     }
 
     @GetMapping("/signup/email/verify")
     fun verifyEmail(
         @RequestParam email: String,
         @RequestParam token: String
-    ) {
+    ): ResponseEntity<ApiResponse<Empty>> {
         signupService.confirmEmailVerification(
             ConfirmEmailVerificationCommand(
                 email,
                 token
             )
         )
-    }
-
-    @GetMapping("/test/{id}")
-    fun test(
-        @PathVariable id: String
-    ): ResponseEntity<SignupResponse> {
-        val result = signupService.test(id)
-
-        return ResponseEntity.ok(SignupResponse(result.id!!, result.username, result.createdAt))
+        return ResponseEntity.ok(ApiResponse.empty())
     }
 }
