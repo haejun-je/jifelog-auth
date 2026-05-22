@@ -14,16 +14,17 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@RequestMapping("/{version}")
 class SignupController(
     private val signupService: SignupService
 ) {
-    @PostMapping("/signup")
+    @PostMapping(version = "1", path = ["/signup"])
     fun signup(
         @RequestBody @Valid request: SignupRequest
     ): ResponseEntity<ApiResponse<SignupResponse>> {
         val command = RegisterUserCommand(
             request.email,
-            request.username,
+            request.nickname,
             request.password
         )
 
@@ -32,15 +33,14 @@ class SignupController(
         return ResponseEntity.ok(
             ApiResponse.of(
                 SignupResponse(
-                    result.id!!,
-                    result.username,
+                    result.id,
                     result.createdAt
                 )
             )
         )
     }
 
-    @PostMapping("/signup/email/verify")
+    @PostMapping(version = "1", path = ["/signup/email/verify"])
     fun sendVerificationEmail(
         @RequestBody @Valid request: SendEmailVerificationRequest
     ): ResponseEntity<ApiResponse<Empty>> {
@@ -53,7 +53,7 @@ class SignupController(
         return ResponseEntity.ok(ApiResponse.empty())
     }
 
-    @GetMapping("/signup/email/verify")
+    @GetMapping(version = "1", path = ["/signup/email/verify"])
     fun verifyEmail(
         @RequestParam email: String,
         @RequestParam token: String

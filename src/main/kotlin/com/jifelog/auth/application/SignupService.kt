@@ -1,5 +1,6 @@
 package com.jifelog.auth.application
 
+import com.fasterxml.uuid.Generators
 import com.jifelog.auth.application.command.ConfirmEmailVerificationCommand
 import com.jifelog.auth.application.command.RegisterUserCommand
 import com.jifelog.auth.application.command.RequestEmailVerificationCommand
@@ -8,12 +9,13 @@ import com.jifelog.auth.common.HashUtils
 import com.jifelog.auth.common.TokenUtils
 import com.jifelog.auth.common.exception.AuthException
 import com.jifelog.auth.common.exception.ErrorCode
+import com.jifelog.auth.domain.Credential
 import com.jifelog.auth.domain.PasswordAlgoType
 import com.jifelog.auth.domain.User
-import com.jifelog.auth.domain.UserPassword
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import java.util.UUID
 
 @Service
 class SignupService(
@@ -28,25 +30,23 @@ class SignupService(
     @Transactional
     fun registerUser(
         command: RegisterUserCommand
-    ): User {
+    ): Credential {
         // 이메일 인증 확인
         if (!tokenQueryPort.checkEmailVerified(command.email)) {
-
             throw AuthException(ErrorCode.EU_01_003)
         }
 
-        val userPassword = UserPassword.withoutId(
-            passwordHasher.encode(command.password),
-            PasswordAlgoType.ARGON2ID
+        // TODO: account-api 생성 요청 추가
+         val userInfoId: UUID = Generators.timeBasedEpochGenerator().generate();
+
+        val credential = Credential.withoutId(
+            userInfoId = userInfoId,
+            loginId = command.email,
+            passwordHash = passwordHasher.encode(command.password),
+            passwordAlgo = PasswordAlgoType.ARGON2ID
         )
 
-        val user = User.withoutId(
-            command.username,
-            command.email,
-            userPassword
-        )
-
-        return signupCommandPort.saveUser(user)
+        return signupCommandPort.saveCredential(credential)
     }
 
     fun requestEmailVerification(

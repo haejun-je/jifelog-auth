@@ -7,7 +7,7 @@ data class SignupRequest(
     @Email
     val email: String,
     @NotBlank
-    val username: String,
+    val nickname: String,
     @NotBlank
     val password: String
 )

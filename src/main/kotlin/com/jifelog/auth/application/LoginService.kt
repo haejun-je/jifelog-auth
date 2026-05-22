@@ -18,14 +18,16 @@ class LoginService(
     fun login(
         command: LoginCommand
     ) {
-        val user = signInQueryPort.loadUser(command.email)
+        val credential = signInQueryPort.loadCredential(command.loginId)
 
         val isValidPassword = passwordHasher.matches(
             command.password,
-            user.userPassword.passwordHash
+            credential.passwordHash
         )
 
         if (isValidPassword) {
+            val user = signInQueryPort.loadUser(credential.userInfoId)
+
             sessionCommandPort.registerUserSession(user)
         } else {
             throw AuthException(ErrorCode.EU_01_001)

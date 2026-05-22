@@ -5,6 +5,5 @@ import java.util.UUID
 
 data class SignupResponse(
     val id: UUID,
-    val username: String,
     val createdAt: Instant
 )

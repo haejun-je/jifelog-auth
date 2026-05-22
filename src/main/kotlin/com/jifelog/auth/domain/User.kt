@@ -1,75 +1,47 @@
 package com.jifelog.auth.domain
 
+import com.fasterxml.uuid.Generators
 import java.time.Instant
 import java.util.UUID
 
 class User(
-    val id: UUID? = null,
+    val id: UUID,
+    val nickname: String,
     val username: String,
-    val email: String,
-    val status: UserStatusType,
+    val profileImg: String,
     val createdAt: Instant,
     val updatedAt: Instant,
-    val deletedAt: Instant? = null,
-    val userPassword: UserPassword
 ) {
     companion object {
         fun withoutId(
-            username: String,
-            email: String,
-            userPassword: UserPassword
+            name: String,
+            nickname: String,
+            profileImg: String
         ): User {
             return User(
-                username = username,
-                email = email,
-                status = UserStatusType.ACTIVE,
+                id = Generators.timeBasedEpochGenerator().generate(),
+                username = name,
+                nickname = nickname,
+                profileImg = profileImg,
                 createdAt = Instant.now(),
-                updatedAt = Instant.now(),
-                userPassword = userPassword,
+                updatedAt = Instant.now()
             )
         }
 
         fun withId(
             id: UUID,
-            username: String,
-            email: String,
-            status: UserStatusType,
+            name: String,
+            nickname: String,
+            profileImg: String,
             createdAt: Instant,
             updatedAt: Instant,
-            deletedAt: Instant?,
-            userPassword: UserPassword
-        ): User {
-            return User(
-                id,
-                username,
-                email,
-                status,
-                createdAt,
-                updatedAt,
-                deletedAt,
-                userPassword
-            )
-        }
-    }
-
-    fun isActive(): Boolean =
-        status == UserStatusType.ACTIVE && deletedAt == null
-
-    fun deactivate(): User =
-        copy(
-            status = UserStatusType.DISABLED,
-            updatedAt = Instant.now()
+        ): User = User(
+            id = id,
+            username = name,
+            nickname = nickname,
+            profileImg = profileImg,
+            createdAt = createdAt,
+            updatedAt = updatedAt
         )
-
-    private fun copy(
-        id: UUID = this.id!!,
-        username: String = this.username,
-        email: String = this.email,
-        status: UserStatusType = this.status,
-        createdAt: Instant = this.createdAt,
-        updatedAt: Instant = this.updatedAt,
-        deletedAt: Instant? = this.deletedAt,
-        userPassword: UserPassword = this.userPassword
-    ): User =
-        User(id, username, email, status, createdAt, updatedAt, deletedAt, userPassword)
+    }
 }
