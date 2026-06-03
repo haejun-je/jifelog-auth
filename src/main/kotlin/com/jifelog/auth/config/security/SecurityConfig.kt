@@ -36,7 +36,7 @@ class SecurityConfig(
             .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests { auth ->
                 auth
-                    .requestMatchers("/login", "/signup/**").permitAll()
+                    .requestMatchers("/*/login", "/*/signup/**").permitAll()
                     .anyRequest().authenticated()
             }
             .addFilterBefore(jifelogJwtAuthFilter, UsernamePasswordAuthenticationFilter::class.java)
