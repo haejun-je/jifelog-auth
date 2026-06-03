@@ -15,14 +15,13 @@ class User(
     companion object {
         fun withoutId(
             name: String,
-            nickname: String,
-            profileImg: String
+            nickname: String
         ): User {
             return User(
                 id = Generators.timeBasedEpochGenerator().generate(),
                 username = name,
                 nickname = nickname,
-                profileImg = profileImg,
+                profileImg = "",
                 createdAt = Instant.now(),
                 updatedAt = Instant.now()
             )

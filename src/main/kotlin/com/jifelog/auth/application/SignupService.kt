@@ -1,6 +1,5 @@
 package com.jifelog.auth.application
 
-import com.fasterxml.uuid.Generators
 import com.jifelog.auth.application.command.ConfirmEmailVerificationCommand
 import com.jifelog.auth.application.command.RegisterUserCommand
 import com.jifelog.auth.application.command.RequestEmailVerificationCommand
@@ -15,7 +14,6 @@ import com.jifelog.auth.domain.User
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import java.util.UUID
 
 @Service
 class SignupService(
@@ -36,11 +34,15 @@ class SignupService(
             throw AuthException(ErrorCode.EU_01_003)
         }
 
-        // TODO: account-api 생성 요청 추가
-         val userInfoId: UUID = Generators.timeBasedEpochGenerator().generate();
+        val savedUser = signupCommandPort.saveUser(
+            User.withoutId(
+                name = command.email,
+                nickname = command.nickname
+            )
+        )
 
         val credential = Credential.withoutId(
-            userInfoId = userInfoId,
+            userInfoId = savedUser.id,
             loginId = command.email,
             passwordHash = passwordHasher.encode(command.password),
             passwordAlgo = PasswordAlgoType.ARGON2ID
