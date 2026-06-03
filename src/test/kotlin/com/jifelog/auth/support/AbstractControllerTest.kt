@@ -3,6 +3,7 @@ package com.jifelog.auth.support
 import com.jifelog.auth.application.LoginService
 import com.jifelog.auth.application.SignupService
 import com.jifelog.auth.config.JacksonConfig
+import com.jifelog.auth.config.WebConfig
 import com.jifelog.auth.presentation.AuthController
 import com.jifelog.auth.presentation.SignupController
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +15,7 @@ import org.springframework.test.web.servlet.MockMvc
 import tools.jackson.databind.json.JsonMapper
 
 @WebMvcTest(AuthController::class, SignupController::class)
-@Import(TestSecurityConfig::class, JacksonConfig::class)
+@Import(TestSecurityConfig::class, JacksonConfig::class, WebConfig::class)
 @TestPropertySource(properties = ["jifelog.security.jwt.secret=test-secret-key-for-testing-only-not-prod"])
 abstract class AbstractControllerTest {
 

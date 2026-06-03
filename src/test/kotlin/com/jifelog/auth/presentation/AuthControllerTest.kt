@@ -27,7 +27,7 @@ class AuthControllerTest : AbstractControllerTest() {
             val payload = LoginRequest("test@example.com", "password123")
 
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -44,7 +44,7 @@ class AuthControllerTest : AbstractControllerTest() {
             val payload = LoginRequest("test@example.com", "wrongpassword")
 
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -61,7 +61,7 @@ class AuthControllerTest : AbstractControllerTest() {
             val payload = LoginRequest("test@example.com", "password123")
 
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -78,7 +78,7 @@ class AuthControllerTest : AbstractControllerTest() {
             val payload = LoginRequest("notfound@example.com", "password123")
 
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -90,9 +90,9 @@ class AuthControllerTest : AbstractControllerTest() {
         @Test
         fun `필수 필드 누락 400 B_00_001`() {
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"email": "", "password": ""}""")
+                    .content("""{"login_id": "", "password": ""}""")
             )
                 .andExpect(status().isBadRequest)
                 .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_001.name))
@@ -102,7 +102,7 @@ class AuthControllerTest : AbstractControllerTest() {
         @Test
         fun `잘못된 JSON 형식 400 B_00_002`() {
             mockMvc.perform(
-                post("/login")
+                post("/v1/login")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("not-valid-json{{{")
             )
@@ -117,8 +117,8 @@ class AuthControllerTest : AbstractControllerTest() {
         @Test
         fun `인증된 사용자 정보 반환 200`() {
             val principal = JifelogPrincipal(
-                userId = "user-id-123",
-                email = "test@example.com",
+                userId = "test@example.com",
+                nickname = "user-id-123",
                 username = "testuser",
                 roles = setOf("ROLE_USER")
             )
@@ -127,17 +127,17 @@ class AuthControllerTest : AbstractControllerTest() {
             )
 
             mockMvc.perform(
-                get("/user").with(authentication(auth))
+                get("/v1/user").with(authentication(auth))
             )
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.data.user_id").value("user-id-123"))
-                .andExpect(jsonPath("$.data.email").value("test@example.com"))
+                .andExpect(jsonPath("$.data.user_id").value("test@example.com"))
+                .andExpect(jsonPath("$.data.nickname").value("user-id-123"))
                 .andExpect(jsonPath("$.data.username").value("testuser"))
         }
 
         @Test
         fun `인증 토큰 없음 401`() {
-            mockMvc.perform(get("/user"))
+            mockMvc.perform(get("/v1/user"))
                 .andExpect(status().isUnauthorized)
         }
     }
