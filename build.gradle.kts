@@ -40,6 +40,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("tools.jackson.module:jackson-module-kotlin")
+    implementation("com.fasterxml.uuid:java-uuid-generator:5.2.0")
     implementation("org.bouncycastle:bcprov-jdk18on:1.83")
 
     implementation("com.resend:resend-java:+")

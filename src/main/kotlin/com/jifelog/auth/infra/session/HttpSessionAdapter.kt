@@ -27,14 +27,14 @@ class HttpSessionAdapter(
         session.setAttribute(
             USER_SESSION,
             UserSession(
-                user.id!!,
-                user.username,
-                user.email,
+                userId = user.id,
+                username = user.username,
+                nickname = user.nickname
             )
         )
     }
 
-    override fun getUser(): UserSession {
+    override fun loadUser(): UserSession {
         //val sessionMap = session.getAttribute(USER_SESSION) as LinkedHashMap<*, *>
 
         /*return UserSession(

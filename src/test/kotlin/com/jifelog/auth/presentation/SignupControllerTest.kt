@@ -56,7 +56,7 @@ class SignupControllerTest : AbstractControllerTest() {
 
             val user = createMockUser(
                 id = uuid,
-                username = payload.username,
+                username = payload.nickname,
                 email = payload.email,
             )
 

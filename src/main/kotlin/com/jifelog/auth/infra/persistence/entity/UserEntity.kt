@@ -1,42 +1,30 @@
 package com.jifelog.auth.infra.persistence.entity
 
-import com.jifelog.auth.infra.persistence.entity.enums.UserStatus
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.Id
 import jakarta.persistence.Table
-import org.hibernate.annotations.DynamicInsert
-import org.hibernate.annotations.UuidGenerator
 import java.time.Instant
 import java.util.UUID
 
 @Entity
-@DynamicInsert
-@Table(schema = "auth", name = "user")
-class UserEntity(
+@Table(schema = "account", name = "user_info")
+data class UserEntity(
     @Id
-    @UuidGenerator(style = UuidGenerator.Style.VERSION_7)
-    @Column(name = "id", columnDefinition = "uuid", updatable = false)
-    val id: UUID? = null,
+    var id: UUID,
 
-    @Column(name = "username", nullable = false)
-    val username: String,
+    @Column(nullable = false, length = 50)
+    var nickname: String,
 
-    @Column(name = "email")
-    val email: String,
+    @Column(nullable = true, length = 50)
+    var username: String,
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false)
-    val status: UserStatus = UserStatus.ACTIVE,
+    @Column(name = "profile_img", nullable = false, length = 50)
+    var profileImg: String,
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    val createdAt: Instant,
+    var createdAt: Instant,
 
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: Instant,
-
-    @Column(name = "deleted_at")
-    val deletedAt: Instant? = null
+    var updatedAt: Instant,
 )
