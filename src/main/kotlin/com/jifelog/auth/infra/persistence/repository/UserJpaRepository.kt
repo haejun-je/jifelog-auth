@@ -7,5 +7,5 @@ import java.util.UUID
 
 interface UserJpaRepository : JpaRepository<UserEntity, UUID> {
     @Query("SELECT c FROM UserEntity c WHERE c.id = :id")
-    fun findByUserId(userId: UUID): UserEntity?
+    fun findByUserId(id: UUID): UserEntity?
 }
