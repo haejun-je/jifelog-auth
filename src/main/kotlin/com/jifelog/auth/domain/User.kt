@@ -30,14 +30,14 @@ class User(
 
         fun withId(
             id: UUID,
-            name: String,
+            username: String,
             nickname: String,
             profileImg: String,
             createdAt: Instant,
             updatedAt: Instant,
         ): User = User(
             id = id,
-            username = name,
+            username = username,
             nickname = nickname,
             profileImg = profileImg,
             createdAt = createdAt,

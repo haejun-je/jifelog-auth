@@ -2,10 +2,8 @@ package com.jifelog.auth.presentation
 
 import com.jifelog.auth.common.exception.AuthException
 import com.jifelog.auth.common.exception.ErrorCode
+import com.jifelog.auth.domain.Credential
 import com.jifelog.auth.domain.PasswordAlgoType
-import com.jifelog.auth.domain.User
-import com.jifelog.auth.domain.UserPassword
-import com.jifelog.auth.domain.UserStatusType
 import com.jifelog.auth.presentation.request.SendEmailVerificationRequest
 import com.jifelog.auth.presentation.request.SignupRequest
 import com.jifelog.auth.support.AbstractControllerTest
@@ -23,21 +21,21 @@ import java.util.*
 
 class SignupControllerTest : AbstractControllerTest() {
 
-    private fun createMockUser(
+    private fun createMockCredential(
         id: UUID = UUID.fromString("550e8400-e29b-41d4-a716-446655440000"),
-        username: String = "testuser",
-        email: String = "test@example.com"
-    ): User {
-        val userPassword = UserPassword.withoutId("hashedPassword", PasswordAlgoType.ARGON2ID)
-        return User.withId(
+        loginId: String = "testuser@example.com"
+    ): Credential {
+        return Credential.withId(
             id = id,
-            username = username,
-            email = email,
-            status = UserStatusType.ACTIVE,
+            userInfoId = UUID.fromString("660e8400-e29b-41d4-a716-446655440000"),
+            loginId = loginId,
+            passwordHash = "hashedPassword",
+            passwordAlgo = PasswordAlgoType.ARGON2ID,
+            passwordUpdatedAt = Instant.parse("2024-01-01T00:00:00Z"),
+            failedCount = 0,
+            lockedUntil = null,
             createdAt = Instant.parse("2024-01-01T00:00:00Z"),
-            updatedAt = Instant.parse("2024-01-01T00:00:00Z"),
-            deletedAt = null,
-            userPassword = userPassword
+            updatedAt = Instant.parse("2024-01-01T00:00:00Z")
         )
     }
 
@@ -48,29 +46,27 @@ class SignupControllerTest : AbstractControllerTest() {
         fun `정상 응답 200`() {
             val payload = SignupRequest(
                 "test@example.com",
-                "username",
+                "nickname",
                 "password123"
             )
 
             val uuid = UUID.randomUUID()
 
-            val user = createMockUser(
+            val mockCredential = createMockCredential(
                 id = uuid,
-                username = payload.nickname,
-                email = payload.email,
+                loginId = payload.email,
             )
 
             BDDMockito.given(signupService.registerUser(any()))
-                .willReturn(user)
+                .willReturn(mockCredential)
 
             mockMvc.perform(
-                post("/signup")
+                post("/v1/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
                 .andExpect(status().isOk)
-                .andExpect(jsonPath("$.data.id").value(user.id.toString()))
-                .andExpect(jsonPath("$.data.username").value(user.username))
+                .andExpect(jsonPath("$.data.id").value(mockCredential.id.toString()))
                 .andExpect(jsonPath("$.data.created_at").exists())
         }
 
@@ -82,7 +78,7 @@ class SignupControllerTest : AbstractControllerTest() {
             val payload = SignupRequest("existing@example.com", "testuser", "password123")
 
             mockMvc.perform(
-                post("/signup")
+                post("/v1/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -99,7 +95,7 @@ class SignupControllerTest : AbstractControllerTest() {
             val payload = SignupRequest("test@example.com", "testuser", "password123")
 
             mockMvc.perform(
-                post("/signup")
+                post("/v1/signup")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -111,9 +107,9 @@ class SignupControllerTest : AbstractControllerTest() {
         @Test
         fun `요청 필드 유효성 실패 400 B_00_001`() {
             mockMvc.perform(
-                post("/signup")
+                post("/v1/signup")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content("""{"email": "not-a-valid-email", "username": "", "password": ""}""")
+                    .content("""{"email": "not-a-valid-email", "nickname": "", "password": ""}""")
             )
                 .andExpect(status().isBadRequest)
                 .andExpect(jsonPath("$.data.error_code").value(ErrorCode.EB_00_001.name))
@@ -129,7 +125,7 @@ class SignupControllerTest : AbstractControllerTest() {
             val payload = SendEmailVerificationRequest("test@example.com")
 
             mockMvc.perform(
-                post("/signup/email/verify")
+                post("/v1/signup/email/verify")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(jsonMapper.writeValueAsString(payload))
             )
@@ -140,7 +136,7 @@ class SignupControllerTest : AbstractControllerTest() {
         @Test
         fun `잘못된 이메일 형식 400 B_00_001`() {
             mockMvc.perform(
-                post("/signup/email/verify")
+                post("/v1/signup/email/verify")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""{"email": "invalid-email"}""")
             )
@@ -155,7 +151,7 @@ class SignupControllerTest : AbstractControllerTest() {
         @Test
         fun `정상 응답 200`() {
             mockMvc.perform(
-                get("/signup/email/verify")
+                get("/v1/signup/email/verify")
                     .param("email", "test@example.com")
                     .param("token", "validtoken123456")
             )
@@ -169,7 +165,7 @@ class SignupControllerTest : AbstractControllerTest() {
                 .given(signupService).confirmEmailVerification(any())
 
             mockMvc.perform(
-                get("/signup/email/verify")
+                get("/v1/signup/email/verify")
                     .param("email", "test@example.com")
                     .param("token", "invalid-token")
             )

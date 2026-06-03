@@ -26,7 +26,7 @@ class AuthController(
     ): ResponseEntity<ApiResponse<JifelogUserData>> =
         ResponseEntity.ok(ApiResponse.of(user))
 
-    @PostMapping(version = "1", path = ["/{version}/login"])
+    @PostMapping(version = "1", path = ["/login"])
     fun login(
         @RequestBody @Valid request: LoginRequest
     ): ResponseEntity<ApiResponse<Empty>> {

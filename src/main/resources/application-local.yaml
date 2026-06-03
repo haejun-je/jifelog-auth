@@ -1,4 +1,12 @@
 server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
+        secure: false
+        http-only: false
+        name: SESSION
+        domain: ~
   port: 8081
 
 logging:
