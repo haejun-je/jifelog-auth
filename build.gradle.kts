@@ -45,7 +45,7 @@ dependencies {
 
     implementation("com.resend:resend-java:+")
 
-    implementation("com.jifelog.platform:jifelog-security-jwt-starter:0.1.0")
+    implementation("com.jifelog.platform:jifelog-security-jwt-starter:0.1.1")
 
     runtimeOnly("org.postgresql:postgresql")
     testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
